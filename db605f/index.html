@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Binary to ASCII Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        .input-section {
+            flex: 1;
+        }
+        .ascii-table {
+            flex: 1;
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 400px;
+            overflow-y: auto;
+        }
+        .ascii-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .ascii-table td, .ascii-table th {
+            border: 1px solid #ddd;
+            padding: 4px;
+            text-align: center;
+        }
+        #binaryInput {
+            width: 100%;
+            height: 150px;
+            font-family: monospace;
+        }
+        #asciiOutput {
+            width: 100%;
+            height: 150px;
+            font-family: monospace;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Binary to ASCII Converter</h1>
+    <div class="container">
+        <div class="input-section">
+            <h3>Binary Input (8 bits per character)</h3>
+            <textarea id="binaryInput" placeholder="Enter binary (1s and 0s)"></textarea>
+            <h3>ASCII Output</h3>
+            <textarea id="asciiOutput" readonly></textarea>
+        </div>
+        <div class="ascii-table">
+            <h3>ASCII Reference Table</h3>
+            <table id="asciiReferenceTable">
+                <tr>
+                    <th>Dec</th>
+                    <th>Bin</th>
+                    <th>Char</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function binaryToAscii(binary) {
+            binary = binary.replace(/[^01]/g, '');
+            let ascii = '';
+            for (let i = 0; i < binary.length; i += 8) {
+                let byte = binary.substr(i, 8);
+                if (byte.length === 8) {
+                    let charCode = parseInt(byte, 2);
+                    ascii += String.fromCharCode(charCode);
+                }
+            }
+            return ascii;
+        }
+
+        function updateOutput() {
+            let binary = document.getElementById('binaryInput').value;
+            let ascii = binaryToAscii(binary);
+            document.getElementById('asciiOutput').value = ascii;
+        }
+
+        function padBinary(num) {
+            return ('00000000' + num.toString(2)).slice(-8);
+        }
+
+        function populateAsciiTable() {
+            let table = document.getElementById('asciiReferenceTable');
+            for (let i = 32; i <= 126; i++) {
+                let row = table.insertRow();
+                row.insertCell(0).textContent = i;
+                row.insertCell(1).textContent = padBinary(i);
+                row.insertCell(2).textContent = String.fromCharCode(i);
+            }
+        }
+
+        document.getElementById('binaryInput').addEventListener('input', updateOutput);
+        populateAsciiTable();
+    </script>
+</body>
+</html>
