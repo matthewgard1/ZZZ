@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Choose Your Adventure</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        #story-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        #story-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        #choices {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #story-image {
+            max-width: 100%;
+            height: auto;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="story-container">
+        <div id="story-text"></div>
+        <img id="story-image" style="display: none;">
+        <div id="choices"></div>
+    </div>
+
+    <script>
+        const story = {
+            start: {
+                text: "You wake up in a mysterious forest. What do you do?",
+                image: "https://picsum.photos/400/300?random=1",
+                choices: [
+                    { text: "Follow the path to the left", next: "left_path" },
+                    { text: "Follow the path to the right", next: "right_path" }
+                ]
+            },
+            left_path: {
+                text: "You find an old cabin. There's smoke coming from the chimney.",
+                image: "https://picsum.photos/400/300?random=2",
+                choices: [
+                    { text: "Knock on the door", next: "cabin_door" },
+                    { text: "Look through the window", next: "cabin_window" }
+                ]
+            },
+            right_path: {
+                text: "You discover a mysterious cave entrance.",
+                image: "https://picsum.photos/400/300?random=3",
+                choices: [
+                    { text: "Enter the cave", next: "cave_entrance" },
+                    { text: "Search around the cave", next: "cave_outside" }
+                ]
+            },
+            cabin_door: {
+                text: "An old wizard opens the door and offers you a magical item.",
+                image: "https://picsum.photos/400/300?random=4",
+                choices: [
+                    { text: "Accept the magical sword", next: "ending_sword" },
+                    { text: "Accept the magical staff", next: "ending_staff" }
+                ]
+            },
+            cabin_window: {
+                text: "You see strange glowing artifacts inside.",
+                image: "https://picsum.photos/400/300?random=5",
+                choices: [
+                    { text: "Break in through the window", next: "ending_caught" },
+                    { text: "Leave quietly", next: "ending_leave" }
+                ]
+            },
+            cave_entrance: {
+                text: "Inside the cave, you find a dragon's treasure!",
+                image: "https://picsum.photos/400/300?random=6",
+                choices: [
+                    { text: "Try to steal some treasure", next: "ending_dragon" },
+                    { text: "Leave the treasure alone", next: "ending_wise" }
+                ]
+            },
+            cave_outside: {
+                text: "You find a magical portal near the cave.",
+                image: "https://picsum.photos/400/300?random=7",
+                choices: [
+                    { text: "Enter the portal", next: "ending_portal" },
+                    { text: "Return to the forest", next: "start" }
+                ]
+            },
+            ending_sword: {
+                text: "You become a legendary warrior with your magical sword!",
+                image: "https://picsum.photos/400/300?random=8",
+                choices: [{ text: "Play Again", next: "start" }]
+            },
+            ending_staff: {
+                text: "You become a powerful wizard with your magical staff!",
+                image: "https://picsum.photos/400/300?random=9",
+                choices: [{ text: "Play Again", next: "start" }]
+            },
+            ending_caught: {
+                text: "The wizard catches you and turns you into a frog!",
+                image: "https://picsum.photos/400/300?random=10",
+                choices: [{ text: "Play Again", next: "start" }]
+            },
+            ending_leave: {
+                text: "You leave peacefully and continue your journey elsewhere.",
+                image: "https://picsum.photos/400/300?random=11",
+                choices: [{ text: "Play Again", next: "start" }]
+            },
+            ending_dragon: {
+                text: "The dragon wakes up and... well, you can guess what happened!",
+                image: "https://picsum.photos/400/300?random=12",
+                choices: [{ text: "Play Again", next: "start" }]
+            },
+            ending_wise: {
+                text: "Your wisdom is rewarded! The dragon gives you a magical gift.",
+                image: "https://picsum.photos/400/300?random=13",
+                choices: [{ text: "Play Again", next: "start" }]
+            },
+            ending_portal: {
+                text: "You enter a magical realm and begin a new adventure!",
+                image: "https://picsum.photos/400/300?random=14",
+                choices: [{ text: "Play Again", next: "start" }]
+            }
+        };
+
+        function showScene(sceneId) {
+            const scene = story[sceneId];
+            document.getElementById('story-text').textContent = scene.text;
+            
+            const image = document.getElementById('story-image');
+            image.src = scene.image;
+            image.style.display = 'block';
+
+            const choicesDiv = document.getElementById('choices');
+            choicesDiv.innerHTML = '';
+            
+            scene.choices.forEach(choice => {
+                const button = document.createElement('button');
+                button.textContent = choice.text;
+                button.onclick = () => showScene(choice.next);
+                choicesDiv.appendChild(button);
+            });
+        }
+
+        showScene('start');
+    </script>
+</body>
+</html>
