@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flappy Gopher</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            display: block;
+            margin: 0 auto;
+            background: #87CEEB;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f0f0f0;
+        }
+        #score {
+            font-size: 24px;
+            margin: 10px;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="score">Score: 0</div>
+    <canvas id="gameCanvas" width="480" height="320"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+
+        const gopher = {
+            x: 50,
+            y: canvas.height / 2,
+            width: 40,
+            height: 40,
+            velocity: 0,
+            gravity: 0.5,
+            jump: -8
+        };
+
+        let obstacles = [];
+        let score = 0;
+        let gameOver = false;
+
+        function createObstacle() {
+            const gap = 120;
+            const minHeight = 50;
+            const maxHeight = canvas.height - gap - minHeight;
+            const height = Math.random() * (maxHeight - minHeight) + minHeight;
+
+            obstacles.push({
+                x: canvas.width,
+                y: 0,
+                width: 30,
+                height: height,
+                passed: false
+            });
+
+            obstacles.push({
+                x: canvas.width,
+                y: height + gap,
+                width: 30,
+                height: canvas.height - height - gap
+            });
+        }
+
+        function drawGopher() {
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(gopher.x, gopher.y, gopher.width, gopher.height);
+            
+            // Gopher face details
+            ctx.fillStyle = 'black';
+            ctx.beginPath();
+            ctx.arc(gopher.x + 30, gopher.y + 15, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(gopher.x + 30, gopher.y + 14, 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawObstacles() {
+            ctx.fillStyle = '#2E8B57';
+            obstacles.forEach(obstacle => {
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                
+                // Draw cactus details
+                if (obstacle.height > 0) {
+                    ctx.fillStyle = '#228B22';
+                    ctx.fillRect(obstacle.x + 10, obstacle.y, 10, obstacle.height);
+                    ctx.fillStyle = '#2E8B57';
+                }
+            });
+        }
+
+        function updateGame() {
+            if (gameOver) return;
+
+            gopher.velocity += gopher.gravity;
+            gopher.y += gopher.velocity;
+
+            if (gopher.y < 0) {
+                gopher.y = 0;
+                gopher.velocity = 0;
+            }
+
+            if (gopher.y + gopher.height > canvas.height) {
+                gameOver = true;
+            }
+
+            obstacles.forEach(obstacle => {
+                obstacle.x -= 2;
+
+                if (!obstacle.passed && obstacle.x + obstacle.width < gopher.x) {
+                    if (!obstacle.y) {
+                        score++;
+                        scoreElement.textContent = `Score: ${score}`;
+                    }
+                    obstacle.passed = true;
+                }
+
+                if (
+                    gopher.x < obstacle.x + obstacle.width &&
+                    gopher.x + gopher.width > obstacle.x &&
+                    gopher.y < obstacle.y + obstacle.height &&
+                    gopher.y + gopher.height > obstacle.y
+                ) {
+                    gameOver = true;
+                }
+            });
+
+            obstacles = obstacles.filter(obstacle => obstacle.x + obstacle.width > 0);
+
+            if (obstacles.length === 0 || obstacles[obstacles.length - 2].x < canvas.width - 200) {
+                createObstacle();
+            }
+        }
+
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawGopher();
+            drawObstacles();
+
+            if (gameOver) {
+                ctx.fillStyle = 'black';
+                ctx.font = '30px Arial';
+                ctx.fillText('Game Over!', canvas.width/2 - 70, canvas.height/2);
+                ctx.font = '20px Arial';
+                ctx.fillText('Click to restart', canvas.width/2 - 60, canvas.height/2 + 30);
+            }
+        }
+
+        function gameLoop() {
+            updateGame();
+            drawGame();
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.addEventListener('click', () => {
+            if (gameOver) {
+                gameOver = false;
+                score = 0;
+                scoreElement.textContent = `Score: ${score}`;
+                gopher.y = canvas.height / 2;
+                gopher.velocity = 0;
+                obstacles = [];
+                createObstacle();
+            } else {
+                gopher.velocity = gopher.jump;
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.code === 'Space') {
+                event.preventDefault();
+                if (!gameOver) {
+                    gopher.velocity = gopher.jump;
+                }
+            }
+        });
+
+        createObstacle();
+        gameLoop();
+    </script>
+</body>
+</html>
